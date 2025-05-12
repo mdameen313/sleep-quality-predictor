@@ -65,7 +65,7 @@ def main():
         caffeine = st.slider("Caffeine (mg)", 0, 500, 100)
     with col2:
         exercise = st.slider("Exercise (mins)", 0, 120, 30)
-        hour = st.slider("Hour", 1.0, 12.0, 10.0, 0.5)
+        hour = st.slider("Sleeping time", 1.0, 12.0, 10.0, 0.5)
         period = st.selectbox("AM/PM", ["PM", "AM"], index=0)
     
     # Time conversion
