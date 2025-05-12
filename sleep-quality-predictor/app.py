@@ -4,7 +4,6 @@ try:
     import matplotlib.pyplot as plt
     import pandas as pd
     from sklearn.tree import DecisionTreeClassifier
-    from sklearn.metrics import precision_score, classification_report
     from sklearn.model_selection import train_test_split
     import os
 except ImportError as e:
@@ -49,25 +48,14 @@ def train_model():
     model = DecisionTreeClassifier()
     model.fit(X_train, y_train)
     
-    # Calculate metrics
-    y_pred = model.predict(X_test)
-    precision = precision_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    
-    return model, precision, report
+    return model
 
 # ===== STREAMLIT UI =====
 def main():
     st.title("😴 Sleep Quality Predictor")
     
-    # Load model and metrics
-    model, precision, report = train_model()
-    
-    # Model performance
-    st.sidebar.header("Model Performance")
-    st.sidebar.metric("Precision Score", f"{precision:.2%}")
-    with st.sidebar.expander("Detailed Report"):
-        st.code(report)
+    # Load model
+    model = train_model()
     
     # User inputs
     col1, col2 = st.columns(2)
@@ -103,17 +91,21 @@ def main():
         
         # Visualization
         st.subheader("Sleep Patterns Analysis")
-        fig, ax = plt.subplots(figsize=(10, 4))
-        data.groupby("Bedtime")["Sleep Quality"].mean().plot(
-            ax=ax, color='teal', linewidth=2.5
-        )
-        ax.axvline(bedtime, color='red', linestyle='--', label='Your bedtime')
-        ax.set_title("Sleep Quality by Bedtime", pad=20)
-        ax.set_xlabel("Bedtime (24h format)", labelpad=10)
-        ax.set_ylabel("Quality Score", labelpad=10)
-        ax.legend()
-        ax.grid(alpha=0.3)
-        st.pyplot(fig)
+        try:
+            data = load_data()
+            fig, ax = plt.subplots(figsize=(10, 4))
+            data.groupby("Bedtime")["Sleep Quality"].mean().plot(
+                ax=ax, color='teal', linewidth=2.5
+            )
+            ax.axvline(bedtime, color='red', linestyle='--', label='Your bedtime')
+            ax.set_title("Sleep Quality by Bedtime", pad=20)
+            ax.set_xlabel("Bedtime (24h format)", labelpad=10)
+            ax.set_ylabel("Quality Score", labelpad=10)
+            ax.legend()
+            ax.grid(alpha=0.3)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error generating visualization: {str(e)}")
 
 if __name__ == "__main__":
     main()
